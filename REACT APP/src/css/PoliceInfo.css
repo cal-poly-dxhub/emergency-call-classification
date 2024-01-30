@@ -1,0 +1,37 @@
+.PoliceInfo{
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.PoliceInfo h1{
+    color: #E84F70;
+}
+
+
+.PoliceInfo img{
+    max-width: 10%;
+    margin: 1em;
+}
+
+
+
+.PoliceInfo .Instructions-Container{
+    /* background-color: red; */
+    max-width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.PoliceInfo .Instructions-Container li{
+    margin-bottom: 3em;
+    font-size: x-large;
+}
+
+.PoliceInfo .Instructions-Container .Title-Img-Container{
+    display: flex;
+}
+
+
+

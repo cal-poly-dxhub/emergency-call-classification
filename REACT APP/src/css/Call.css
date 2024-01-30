@@ -1,0 +1,68 @@
+.Call{
+    min-height: 100vh;
+    width: 100vw;
+     display: flex;
+     flex-direction: column;
+}
+
+.Call .Title-Container{
+    align-self: center;
+}
+
+.Call img{
+    width: 25%;
+    padding: 1em;
+    transition: 0.3s;
+}
+
+.Call img:hover{
+    cursor: pointer;
+}
+
+
+.Call .Content{
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.Call .Police-Container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.4em;
+    color:#E84F70;
+}
+
+.Call .CoResponder-Container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.4em;
+    color: #F2C46D;
+}
+
+.Call .NoIssue-Container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.4em;
+    color: #41D9A1;
+}
+
+.Call .AltResponse-Container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.4em;
+    color: #268EA6;
+}
