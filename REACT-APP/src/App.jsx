@@ -1,7 +1,7 @@
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
 
 //pages
-import Landing from "./pages/landing"
+import Landing from "./pages/Landing"
 import Call from "./pages/Call"
 import PoliceInfo from "./pages/PoliceInfo"
 

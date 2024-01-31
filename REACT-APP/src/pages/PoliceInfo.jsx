@@ -12,10 +12,12 @@ export default function PoliceInfo(){
     return (
         <div className="PoliceInfo">
 
-<img src={policeResponse} />
+            
             <div className='Instructions-Container'>
                 <ol>
+                
                     <div className='Title-Img-Container'>
+                    <img src={policeResponse} /> 
                         <h1>Police Response Required</h1>
                     </div>
 

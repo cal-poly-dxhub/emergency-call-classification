@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import useWebSocket from 'react-use-websocket'
+import throttle from 'lodash.throttle'
 
 
 //css 
@@ -18,10 +20,14 @@ export default function Call(){
     const [altResponseConfidence, setAltResponseConfidence] = useState(0);
     const { id } = useParams();
     const navigate = useNavigate();
-    
+    const WS_URL = 'wss://cv372khba8.execute-api.us-west-2.amazonaws.com/production/';
+    const {  lastMessage, sendMessage, lastJsonMessage }  = useWebSocket(WS_URL);
 
 
-    
+    if ( lastMessage && lastJsonMessage ){
+        console.log(lastMessage);
+        console.log(lastJsonMessage);
+    }
   
     
 
@@ -31,6 +37,9 @@ export default function Call(){
         <div className='Title-Container'>
             <h1>Caller ID: {id}</h1>
         </div>
+        
+        <button onClick={()=>{sendMessage("hello World!")}}>click me</button>
+        
         
      <div className='Content'>
         <div className='Police-Container' style={{transform: `scale(${1 + policeConfidence})`}}>
