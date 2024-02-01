@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import useWebSocket from 'react-use-websocket'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 import throttle from 'lodash.throttle'
 
 
@@ -21,13 +21,21 @@ export default function Call(){
     const { id } = useParams();
     const navigate = useNavigate();
     const WS_URL = 'wss://cv372khba8.execute-api.us-west-2.amazonaws.com/production/';
-    const {  lastMessage, sendMessage, lastJsonMessage }  = useWebSocket(WS_URL);
+    const {  lastMessage, sendMessage, lastJsonMessage, readyState, sendJsonMessage }  = useWebSocket(WS_URL);
 
 
     if ( lastMessage && lastJsonMessage ){
         console.log(lastMessage);
         console.log(lastJsonMessage);
     }
+    
+    const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState];
   
     
 
@@ -38,7 +46,9 @@ export default function Call(){
             <h1>Caller ID: {id}</h1>
         </div>
         
-        <button onClick={()=>{sendMessage("hello World!")}}>click me</button>
+       <button onClick={()=>{sendJsonMessage({ action: "sendMessage", data: "hello world" })}}>click me</button>
+        
+        <span>The WebSocket is currently {connectionStatus}</span>
         
         
      <div className='Content'>
