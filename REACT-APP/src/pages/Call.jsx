@@ -52,30 +52,30 @@ export default function Call(){
         
         
      <div className='Content'>
-        <div className='Police-Container' style={{transform: `scale(${1 + policeConfidence})`}}>
+        <div className='Police-Container' style={{transform: `scale(${Math.min(1 + policeConfidence,2)})`}}>
             <span>Police Response</span>
             <span>Required</span>
             <img src={policeResponse}  onClick={() => navigate("/PoliceInfo")}/>
-            <span>{policeConfidence * 100}%</span>
+            <span>{Math.min(policeConfidence * 100,100)}%</span>
         </div>
 
-        <div className='CoResponder-Container' style={{transform: `scale(${1 + coResponserConfidence})`}}>
+        <div className='CoResponder-Container' style={{transform: `scale(${Math.min(1 + coResponserConfidence,2)})`}}>
             <span>Co-Responder</span>
             <img src= {coResponser} />
-            <span>{coResponserConfidence*100}%</span>
+            <span>{Math.min(coResponserConfidence*100,100)}%</span>
         </div>
 
-        <div className='NoIssue-Container' style={{transform: `scale(${1 + noIssueConfidence})`}}>
+        <div className='NoIssue-Container' style={{transform: `scale(${Math.min(1 + noIssueConfidence,2)})`}}>
             <span>No Safety Issue</span>
             <img src={noIssue} />
-            <span>{noIssueConfidence*100}%</span>
+            <span>{Math.min(noIssueConfidence*100,100)}%</span>
         </div>
 
-        <div className='AltResponse-Container' style={{transform: `scale(${1 + altResponseConfidence})`}}>
+        <div className='AltResponse-Container' style={{transform: `scale(${Math.min(1 + altResponseConfidence,2)})`}}>
             <span>Alternate</span>
             <span>Response</span>
             <img src={altResponse} />
-            <span>{altResponseConfidence*100}%</span>
+            <span>{Math.min(altResponseConfidence*100,100)}%</span>
         </div>
         </div>
         
