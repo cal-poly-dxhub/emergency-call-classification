@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  CallsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: '''GET,POST,PUT,DELETE,OPTIONS'''
+        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+        AllowOrigin: '''*'''
+  CallsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CallsFunction
+      Handler: main.lambda_handler
+      Runtime: python3.9
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: CallsTable
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: CallsTable
+      Events:
+        GetCalls:
+          Type: Api
+          Properties:
+            Path: /callfun
+            Method: get
+            RestApiId:
+              Ref: CallsApi
+    Metadata:
+      SamResourceId: CallsFunction
+  DeleteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: DeleteFunction
+      Handler: deletion.lambda_handler
+      Runtime: python3.9
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Ref: CallsTable
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: CallsTable
+      Events:
+        DeleteCall:
+          Type: Api
+          Properties:
+            Path: /callfun
+            Method: post
+            RestApiId:
+              Ref: CallsApi
+    Metadata:
+      SamResourceId: DeleteFunction
+  CallsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: current_calls
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+Outputs:
+  CallsApiEndpoint:
+    Description: API Gateway endpoint URL for Prod stage for Calls function
+    Value:
+      Fn::Sub: https://${CallsApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/callfun
+    Export:
+      Name: CallsApiEndpoint
