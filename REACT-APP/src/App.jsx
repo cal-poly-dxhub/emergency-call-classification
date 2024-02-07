@@ -14,7 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/calls/:id/" element={<Call />} />
-          <Route path="/PoliceInfo/" element={<PoliceInfo />}/>
+          <Route path="/PoliceInfo/:issue/" element={<PoliceInfo />}/>
         </Routes>
       </BrowserRouter>
     </div>
