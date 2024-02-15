@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import throttle from 'lodash.throttle'
@@ -22,6 +22,7 @@ export default function Call(){
     const navigate = useNavigate();
     const WS_URL = 'wss://cv372khba8.execute-api.us-west-2.amazonaws.com/production/';
     const {  lastMessage, sendMessage, lastJsonMessage, readyState, sendJsonMessage }  = useWebSocket(WS_URL);
+    const [mockData,setMockData] = useState(null)
 
 
     if ( lastMessage && lastJsonMessage ){
@@ -37,6 +38,37 @@ export default function Call(){
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
   
+  const getMock = async () => {
+    try {
+      const response = await fetch('https://my-json-server.typicode.com/ryangertz/testdb3/confidence');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const calls = await response.json();
+      return calls;
+    } catch (error) {
+      console.error("Could not fetch the calls:", error.message);
+    }
+  };
+  
+    useEffect(() => {
+        const setter = async () =>{
+            const data = await getMock();
+            setMockData(data);
+        }
+        setter()
+        }, []);
+        
+    useEffect(() => {
+        if (mockData) {
+            setAltResponseConfidence(mockData["Alt-Response"]);
+            setCoResponserConfidence(mockData["Co-Responder"]);
+            setPoliceConfidence(mockData["Police-Response"]);
+            setNoIssueConfidence(mockData["No-issue"]);
+        }
+    }, [mockData]);
+  
+    
     
 
     return(
@@ -46,37 +78,42 @@ export default function Call(){
             <h1>Caller ID: {id}</h1>
         </div>
         
-       <button onClick={()=>{sendJsonMessage({ action: "sendMessage", data: "hello world" })}}>click me</button>
+      {/* <button onClick={()=>{sendJsonMessage({ action: "sendMessage", data: "hello world" })}}>click me</button>
         
-        <span>The WebSocket is currently {connectionStatus}</span>
+        <span>The WebSocket is currently {connectionStatus}</span> */}
         
         
      <div className='Content'>
-        <div className='Police-Container' style={{transform: `scale(${Math.min(1 + policeConfidence,2)})`}}>
+       {mockData && mockData["Police-Response"] ? 
+       <div className='Police-Container' style={{transform: `scale(${Math.min(1 + policeConfidence,2)})`}}>
             <span>Police Response</span>
             <span>Required</span>
             <img src={policeResponse}  onClick={() => navigate(`/PoliceInfo/${"policeResponse"}`)}/>
             <span>{Math.min(policeConfidence * 100,100)}%</span>
-        </div>
+        </div> : null}
 
+        {mockData && mockData["Co-Responder"] ? 
         <div className='CoResponder-Container' style={{transform: `scale(${Math.min(1 + coResponserConfidence,2)})`}}>
             <span>Co-Responder</span>
             <img src= {coResponser} onClick={() => navigate(`/PoliceInfo/${"coResponser"}`)} />
             <span>{Math.min(coResponserConfidence*100,100)}%</span>
-        </div>
+        </div> : null}
 
+        {mockData && mockData["No-issue"] ? 
         <div className='NoIssue-Container' style={{transform: `scale(${Math.min(1 + noIssueConfidence,2)})`}}>
             <span>No Safety Issue</span>
             <img src={noIssue} onClick={() => navigate(`/PoliceInfo/${"noIssue"}`)}/>
             <span>{Math.min(noIssueConfidence*100,100)}%</span>
-        </div>
+        </div>  : null }
 
-        <div className='AltResponse-Container' style={{transform: `scale(${Math.min(1 + altResponseConfidence,2)})`}}>
+       {mockData && mockData["Alt-Response"] ? 
+       <div className='AltResponse-Container' style={{transform: `scale(${Math.min(1 + altResponseConfidence,2)})`}}>
             <span>Alternate</span>
             <span>Response</span>
             <img src={altResponse} onClick={() => navigate(`/PoliceInfo/${"altResponse"}`)}/>
             <span>{Math.min(altResponseConfidence*100,100)}%</span>
-        </div>
+        </div> : null }
+        
         </div>
         
     </div>
