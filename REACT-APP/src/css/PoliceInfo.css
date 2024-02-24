@@ -33,6 +33,8 @@
 
 .PoliceInfo .Instructions-Container .Title-Img-Container{
     display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 

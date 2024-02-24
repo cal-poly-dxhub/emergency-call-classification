@@ -18,6 +18,7 @@ export default function Call(){
     const [noIssueConfidence, setNoIssueConfidence] = useState(0);
     const [coResponserConfidence, setCoResponserConfidence] = useState(0);
     const [altResponseConfidence, setAltResponseConfidence] = useState(0);
+    const[callInstructions,setCallInstructions] = useState("");
     const { id } = useParams();
     const navigate = useNavigate();
     const WS_URL = 'wss://cv372khba8.execute-api.us-west-2.amazonaws.com/production/';
@@ -57,6 +58,24 @@ export default function Call(){
     useEffect(() => {
         if (darrenData) {
             console.log(darrenData);
+            console.log(darrenData["POLICE"])
+            console.log(darrenData["CORESPONDER"])
+            console.log(darrenData["NOISSUE"])
+            console.log(darrenData["Instructions"])
+            console.log(darrenData["ALTERNATE"])
+            if(darrenData["ALTERNATE"]){
+              setAltResponseConfidence(Math.round(darrenData["ALTERNATE"] * 100));
+            }
+            if(darrenData["CORESPONDER"]){
+              setCoResponserConfidence(Math.round(darrenData["CORESPONDER"] * 100));
+            }
+            if(darrenData["POLICE"]){
+              setPoliceConfidence(Math.round(darrenData["POLICE"] * 100));
+            }
+            if(darrenData["NOISSUE"]){
+              setNoIssueConfidence(Math.round(darrenData["NOISSUE"] * 100));
+            }
+            setCallInstructions(darrenData["Instructions"]);
         }
     }, [darrenData]);
     
@@ -68,35 +87,49 @@ export default function Call(){
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
   
-  const getMock = async () => {
-    try {
-      const response = await fetch('https://my-json-server.typicode.com/ryangertz/testdb3/confidence');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const calls = await response.json();
-      return calls;
-    } catch (error) {
-      console.error("Could not fetch the calls:", error.message);
-    }
-  };
+  // const getMock = async () => {
+  //   try {
+  //     const response = await fetch('https://my-json-server.typicode.com/ryangertz/testdb3/confidence');
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     const calls = await response.json();
+  //     return calls;
+  //   } catch (error) {
+  //     console.error("Could not fetch the calls:", error.message);
+  //   }
+  // };
   
-    useEffect(() => {
-        const setter = async () =>{
-            const data = await getMock();
-            setMockData(data);
-        }
-        setter()
-        }, []);
+  //   useEffect(() => {
+  //       const setter = async () =>{
+  //           const data = await getMock();
+  //           setMockData(data);
+  //       }
+  //       setter()
+  //       }, []);
         
-    useEffect(() => {
-        if (mockData) {
-            setAltResponseConfidence(mockData["Alt-Response"]);
-            setCoResponserConfidence(mockData["Co-Responder"]);
-            setPoliceConfidence(mockData["Police-Response"]);
-            setNoIssueConfidence(mockData["No-issue"]);
-        }
-    }, [mockData]);
+  //   useEffect(() => {
+  //       if (mockData) {
+  //           setAltResponseConfidence(mockData["Alt-Response"]);
+  //           setCoResponserConfidence(mockData["Co-Responder"]);
+  //           setPoliceConfidence(mockData["Police-Response"]);
+  //           setNoIssueConfidence(mockData["No-issue"]);
+  //       }
+  //   }, [mockData]);
+  
+    function Instructions({ text }) {
+  // Split the text into lines
+  const lines = text.split('\n');
+  console.log(lines);
+  return (
+    <ol>
+      {lines.map((line, index) => (
+        // Use index as a key; it's acceptable here since the list is static
+        <li key={index}>{line}</li>
+      ))}
+    </ol>
+  );
+}
   
     
     
@@ -114,49 +147,50 @@ export default function Call(){
         
         
      <div className='Content'>
-       {mockData && mockData["Police-Response"] ? 
-       <div className='Police-Container' style={{transform: `scale(${Math.min(1 + policeConfidence,2)})`}}>
+       {/*darrenData && darrenData["POLICE"] ? 
+       <div className='Police-Container' style={{transform: `scale(${Math.min((policeConfidence/100)+1,2)})`}}>
             <span>Police Response</span>
             <span>Required</span>
             <img src={policeResponse}  onClick={() => navigate(`/PoliceInfo/${"policeResponse"}`)}/>
-            <span>{Math.min(policeConfidence * 100,100)}%</span>
+            <span>{Math.min(policeConfidence,100)}%</span>
             <ol>
               <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditatedfaasdfsdfasdfasdf</li>
               <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
               <li>Lorem ipsum dolor sit amet consectetur adipisicing.</li>
             </ol>
+        </div> : null*/}
+      {darrenData && darrenData["POLICE"] ? 
+       <div className='Police-Container' style={{transform: `scale(${Math.min((policeConfidence/100)+1,2)})`}}>
+            <span>Police Response</span>
+            <span>Required</span>
+            <img src={policeResponse}  onClick={() => navigate(`/PoliceInfo/${"policeResponse"}`)}/>
+            <span>{Math.min(policeConfidence,100)}%</span>
+            <Instructions text={callInstructions} />
         </div> : null}
 
-        {mockData && mockData["Co-Responder"] ? 
-        <div className='CoResponder-Container' style={{transform: `scale(${Math.min(1 + coResponserConfidence,2)})`}}>
+        {darrenData && darrenData["CORESPONDER"] ? 
+        <div className='CoResponder-Container' style={{transform: `scale(${Math.min((coResponserConfidence/100)+1,2)})`}}>
             <span>Co-Responder</span>
             <img src= {coResponser} onClick={() => navigate(`/PoliceInfo/${"coResponser"}`)} />
-            <span>{Math.min(coResponserConfidence*100,100)}%</span>
-            <ol>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate</li>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing.</li>
-            </ol>
+            <span>{Math.min(coResponserConfidence,100)}%</span>
+            <Instructions text={callInstructions} />
         </div> : null}
 
-        {mockData && mockData["No-issue"] ? 
-        <div className='NoIssue-Container' style={{transform: `scale(${Math.min(1 + noIssueConfidence,2)})`}}>
+        {darrenData && darrenData["NOISSUE"] ? 
+        <div className='NoIssue-Container' style={{transform: `scale(${Math.min((noIssueConfidence/100)+1,2)})`}}>
           <span>No Safety Issue</span>
           <img src={noIssue} onClick={() => navigate(`/PoliceInfo/${"noIssue"}`)}/>
-          <span>{Math.min(noIssueConfidence*100,100)}%</span>
+          <span>{Math.min(noIssueConfidence,100)}%</span>
+          <Instructions text={callInstructions} />
         </div>  : null }
 
-       {mockData && mockData["Alt-Response"] ? 
-       <div className='AltResponse-Container' style={{transform: `scale(${Math.min(1 + altResponseConfidence,2)})`}}>
+       {darrenData && darrenData["ALTERNATE"] ? 
+       <div className='AltResponse-Container' style={{transform: `scale(${Math.min((altResponseConfidence/100)+1,2)})`}}>
           <span>Alternate</span>
           <span>Response</span>
           <img src={altResponse} onClick={() => navigate(`/PoliceInfo/${"altResponse"}`)}/>
-          <span>{Math.min(altResponseConfidence*100,100)}%</span>
-          <ol>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate</li>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing.</li>
-          </ol>
+          <span>{Math.min(altResponseConfidence,100)}%</span>
+          <Instructions text={callInstructions} />
         </div> : null }
         
         </div>

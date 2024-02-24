@@ -25,7 +25,7 @@
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
 }
 
 .Call .Police-Container{
@@ -36,6 +36,13 @@
     font-weight: bold;
     font-size: 1.4em;
     color:#E84F70;
+    margin: auto
+}
+
+.Call .Content ol{
+    font-size: 0.5em;
+    width: 200px;
+    word-wrap: break-word;
 }
 
 .Call .CoResponder-Container{
@@ -46,6 +53,7 @@
     font-weight: bold;
     font-size: 1.4em;
     color: #F2C46D;
+    margin: auto;
 }
 
 .Call .NoIssue-Container{
@@ -56,6 +64,7 @@
     font-weight: bold;
     font-size: 1.4em;
     color: #41D9A1;
+    margin: auto;
 }
 
 .Call .AltResponse-Container{
@@ -66,4 +75,5 @@
     font-weight: bold;
     font-size: 1.4em;
     color: #268EA6;
+    margin: auto;
 }
