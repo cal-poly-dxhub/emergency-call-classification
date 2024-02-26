@@ -35,7 +35,11 @@ export default function Call(){
     
     const getDarrenData = async () => {
     try {
-      const response = await fetch('https://spdcare.calpoly.io/classifiedResults.json');
+      const url = new URL('https://spdcare.calpoly.io/classifiedResults.json'); //so the browser does not cache
+      url.searchParams.append('nocache', new Date().getTime());
+    
+    
+      const response = await fetch(url.toString());
       if (!response.ok) {
         throw new Error(`HTTPS error! status: ${response.status}`);
       }
@@ -61,7 +65,7 @@ export default function Call(){
             console.log(darrenData["POLICE"])
             console.log(darrenData["CORESPONDER"])
             console.log(darrenData["NOISSUE"])
-            console.log(darrenData["Instructions"])
+            // console.log(darrenData["Instructions"])
             console.log(darrenData["ALTERNATE"])
             if(darrenData["ALTERNATE"]){
               setAltResponseConfidence(Math.round(darrenData["ALTERNATE"] * 100));
@@ -120,7 +124,7 @@ export default function Call(){
     function Instructions({ text }) {
   // Split the text into lines
   const lines = text.split('\n');
-  console.log(lines);
+  // console.log(lines);
   return (
     <ol>
       {lines.map((line, index) => (
@@ -130,36 +134,21 @@ export default function Call(){
     </ol>
   );
 }
-  
-    
-    
 
     return(
     <div className='Call'>
 
-        <div className='Title-Container'>
-            <h1>Caller ID: {id}</h1>
-        </div>
+      <div className='Title-Container'>
+        <h1>Caller ID: {id}</h1>
+      </div>
         
       {/* <button onClick={()=>{sendJsonMessage({ action: "sendMessage", data: "hello world" })}}>click me</button>
         
         <span>The WebSocket is currently {connectionStatus}</span> */}
+       
         
-        
-     <div className='Content'>
-       {/*darrenData && darrenData["POLICE"] ? 
-       <div className='Police-Container' style={{transform: `scale(${Math.min((policeConfidence/100)+1,2)})`}}>
-            <span>Police Response</span>
-            <span>Required</span>
-            <img src={policeResponse}  onClick={() => navigate(`/PoliceInfo/${"policeResponse"}`)}/>
-            <span>{Math.min(policeConfidence,100)}%</span>
-            <ol>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditatedfaasdfsdfasdfasdf</li>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
-              <li>Lorem ipsum dolor sit amet consectetur adipisicing.</li>
-            </ol>
-        </div> : null*/}
-      {darrenData && darrenData["POLICE"] ? 
+      <div className='Content'>
+        {darrenData && darrenData["POLICE"] ? 
        <div className='Police-Container' style={{transform: `scale(${Math.min((policeConfidence/100)+1,2)})`}}>
             <span>Police Response</span>
             <span>Required</span>
@@ -193,8 +182,8 @@ export default function Call(){
           <Instructions text={callInstructions} />
         </div> : null }
         
-        </div>
+      </div>
         
     </div>
-    )
+  )
 }
