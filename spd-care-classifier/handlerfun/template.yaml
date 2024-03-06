@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A SAM template for deploying a Lambda function that is triggered by DynamoDB and puts an item into another DynamoDB table.
+
+Resources:
+  # Output DynamoDB Table where the Lambda function will put an item
+  OutputDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PredictionsTable
+      AttributeDefinitions:
+        - AttributeName: callId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: callId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  # Lambda Function that will be triggered by DynamoDB
+  ComprehendAndS3LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      CodeUri: lambda-code
+      Handler: main.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OutputDynamoDBTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - comprehend:ClassifyDocument
+                - s3:PutObject
+              Resource: "*"
+      Events:
+        DynamoDBEvent:
+          Type: DynamoDB
+          Properties:
+            Stream: arn:aws:dynamodb:us-west-2:882364546937:table/current_calls/stream/2024-03-05T19:15:16.316
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 5

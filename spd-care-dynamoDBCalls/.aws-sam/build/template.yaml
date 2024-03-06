@@ -75,7 +75,7 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
       StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
+        StreamViewType: NEW_IMAGE
 Outputs:
   CallsApiEndpoint:
     Description: API Gateway endpoint URL for Prod stage for Calls function
