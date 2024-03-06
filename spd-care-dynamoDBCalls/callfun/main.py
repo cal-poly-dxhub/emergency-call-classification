@@ -12,10 +12,15 @@ def lambda_handler(event, context):
     
     try:
         # Fetch all items from the table (scan operation)
-        response = table.scan()
-        
+        response = table.scan(Select = 'SPECIFIC_ATTRIBUTES',
+           ProjectionExpression="#loc, #id",
+           ExpressionAttributeNames={"#loc": "location",
+                                     "#id" : "id"
+           })
+    
         # Prepare the items to return
         items = response['Items']
+        print(items)
         return {
             'statusCode': 200,
             'body': json.dumps(items),

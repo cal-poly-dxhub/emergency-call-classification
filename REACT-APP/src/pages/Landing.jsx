@@ -35,7 +35,8 @@ export default function Landing() {
     const setter = async () => {
       const callsData = await getCalls();
       if (callsData) {
-        setCalls(callsData[0].calls);
+        console.log(callsData)
+        setCalls(callsData);
       }
     };
     setter();
@@ -50,7 +51,7 @@ export default function Landing() {
       </div>
 
       <div className='Calls-Container'>
-        {calls ? calls.map((call, index) => (
+        {/*calls ? calls.map((call, index) => (
         <div key={index} className='Call-Card' onClick={() => {
                 fetch('https://di2g4utr9d.execute-api.us-west-2.amazonaws.com/Prod/callfun', {
                   method: 'POST',
@@ -66,7 +67,15 @@ export default function Landing() {
           <p className='Call-Title'>{calls[index][0]} - {calls[index][1]}</p>
           <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis facere quas libero commodi obcaecati, porro assumenda! Qui deleniti soluta exercitationem provident quae similique quis repellendus? Veniam laudantium quam nobis ipsam.</p>
         </div>
-          )) : <span>pending... </span>}
+          )) : <span>pending... </span>*/}
+        {calls ? calls.map((call,index)=>(
+          <div key={index} className='Call-Card' onClick={()=>{
+            navigate(`/calls/${call["id"]}`)
+          }}>
+          <p className='Call-Title'>{call["id"]} - Location</p>
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis facere quas libero commodi obcaecati, porro assumenda! Qui deleniti soluta</p>
+          </div>
+        )) : <span> pending... </span>}
       </div>
 
     </div>
