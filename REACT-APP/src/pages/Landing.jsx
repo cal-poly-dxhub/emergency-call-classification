@@ -8,11 +8,6 @@ import '../css/Landing.css'
 
 export default function Landing() {
   
-  
-  // const [calls, setCalls] = useState(
-  //   [{Name: "Call 1", Location: "Capitol Hill", id: 1},
-  //   {Name: "Call 2", Location: "Green Lake", id: 2},
-  //   {Name: "Call 3", Location: "Queen Anne", id: 3}]);
 
   const [calls, setCalls] = useState([]);
   const navigate = useNavigate();
@@ -35,7 +30,7 @@ export default function Landing() {
     const setter = async () => {
       const callsData = await getCalls();
       if (callsData) {
-        console.log(callsData)
+        // console.log(callsData)
         setCalls(callsData);
       }
     };
@@ -43,7 +38,7 @@ export default function Landing() {
   }, []);
   
 
-
+  //TODO: display "no active calls" if no active calls
   return (
     <div className='Landing'>
       <div className='Title-Container'>
@@ -69,10 +64,9 @@ export default function Landing() {
         </div>
           )) : <span>pending... </span>*/}
         {calls ? calls.map((call,index)=>(
-          <div key={index} className='Call-Card' onClick={()=>{
-            navigate(`/calls/${call["id"]}`)
-          }}>
-          <p className='Call-Title'>{call["id"]} - Location</p>
+          call["active"] &&
+          <div key={call["id"]} className='Call-Card' onClick={()=>{navigate(`/calls/${call["id"]}`)}}>
+          <p className='Call-Title'>{call["id"]} - {call["loc"]}</p>
           <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis facere quas libero commodi obcaecati, porro assumenda! Qui deleniti soluta</p>
           </div>
         )) : <span> pending... </span>}
