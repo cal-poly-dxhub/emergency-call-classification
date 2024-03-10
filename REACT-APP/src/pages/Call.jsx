@@ -21,12 +21,12 @@ export default function Call(){
     const [callInstructions,setCallInstructions] = useState("");
     const { id } = useParams(); //call id from landing page
     const navigate = useNavigate();
-    const[darrenData, setDarrenData] = useState(null)
+    const[predictionData, setPredictionData] = useState(null)
     const loadingTexts = ['Predicting','Predicting.', 'Predicting..', 'Predicting...'];
     const [currentText, setCurrentText] = useState(0);
     const WS_URL = 'wss://cv372khba8.execute-api.us-west-2.amazonaws.com/production/';
     const didUnmount = useRef(false)
-    const { lastJsonMessage, readyState, sendJsonMessage }  = useWebSocket(WS_URL, {
+    const { lastJsonMessage, readyState }  = useWebSocket(WS_URL, {
       queryParams: {id},
       shouldReconnect: (closeEvent) => {
         return didUnmount.current === false;
@@ -36,28 +36,24 @@ export default function Call(){
     });
 
 
-    
+    const connectionStatus = {
+      [ReadyState.CONNECTING]: 'Connecting',
+      [ReadyState.OPEN]: 'Open',
+      [ReadyState.CLOSING]: 'Closing',
+      [ReadyState.CLOSED]: 'Closed',
+      [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+    }[readyState];
     
     
     useEffect(()=>{
       if (lastJsonMessage){
         console.log(lastJsonMessage);
-        var coresponderValue = parseFloat(lastJsonMessage.M.CORESPONDER.N);
-        var noIssueValue = parseFloat(lastJsonMessage.M.NOISSUE.N);
-        var policeValue = parseFloat(lastJsonMessage.M.POLICE.N);
-        setDarrenData(lastJsonMessage)
         
-        setPoliceConfidence(Math.round((parseFloat(lastJsonMessage?.M?.POLICE?.N) ?? 0) *100));
-        setNoIssueConfidence(Math.round((parseFloat(lastJsonMessage?.M?.NOISSUE?.N) ?? 0) *100))
-        setCoResponserConfidence(Math.round((parseFloat(lastJsonMessage?.M?.CORESPONDER?.N) ?? 0) *100))
-        setAltResponseConfidence(Math.round((parseFloat(lastJsonMessage?.M?.ALTERNATE?.N) ?? 0) *100))
-
-        console.log(coresponderValue, noIssueValue, policeValue);
-        // setDarrenData(lastJsonMessage)
+        setPredictionData(lastJsonMessage)
     }
     },[lastJsonMessage])
     
-  //   const getDarrenData = async () => {
+  //   const getpredictionData = async () => {
   //   try {
   //     const url = new URL('https://spdcare.calpoly.io/classifiedResults.json'); //so the browser does not cache
   //     url.searchParams.append('nocache', new Date().getTime());
@@ -82,47 +78,35 @@ export default function Call(){
     
     // useEffect(() => {
     //     const setter = async () =>{
-    //         const data = await getDarrenData();
-    //         setDarrenData(data);
+    //         const data = await getpredictionData();
+    //         setpredictionData(data);
     //     }
     //     setter()
     //     }, []);
         
     useEffect(() => {
-        if (darrenData) {
-            // console.log(darrenData);
-            // console.log(darrenData["POLICE"])
-            // console.log(darrenData["CORESPONDER"])
-            // console.log(darrenData["NOISSUE"])
-            // console.log(darrenData["Instructions"])
-            // console.log(darrenData["ALTERNATE"])
-            if(darrenData["ALTERNATE"]){
-              setAltResponseConfidence(Math.round(darrenData["ALTERNATE"] * 100));
-              //setAltResponseConfidence((darrenData["ALTERNATE"]*100).toFixed(2));
+        if (predictionData) {
+            if(predictionData.M.ALTERNATE){
+              setAltResponseConfidence(Math.round((parseFloat(lastJsonMessage?.M?.ALTERNATE?.N) ?? 0) *100))
+              //setAltResponseConfidence((predictionData["ALTERNATE"]*100).toFixed(2));
             }
-            if(darrenData["CORESPONDER"]){
-              setCoResponserConfidence(Math.round(darrenData["CORESPONDER"] * 100));
-              //setCoResponderConfidence((darrenData["CORESPONDER"]*100).toFixed(2));
+            if(predictionData.M.CORESPONDER){
+              setCoResponserConfidence(Math.round((parseFloat(lastJsonMessage?.M?.CORESPONDER?.N) ?? 0) *100));
+              //setCoResponderConfidence((predictionData["CORESPONDER"]*100).toFixed(2));
             }
-            if(darrenData["POLICE"]){
-              setPoliceConfidence(Math.round(darrenData["POLICE"] * 100));
-              // setPoliceConfidence((darrenData["POLICE"]*100).toFixed(2))
+            if(predictionData.M.POLICE){
+              setPoliceConfidence(Math.round((parseFloat(lastJsonMessage?.M?.POLICE?.N) ?? 0) *100));
+              // setPoliceConfidence((predictionData["POLICE"]*100).toFixed(2))
             }
-            if(darrenData["NOISSUE"]){
-              setNoIssueConfidence(Math.round(darrenData["NOISSUE"] * 100));
-              //setNoIssueConfidence(darrenData["NOISSUE"]*100).toFixed(2));
+            if(predictionData.M.NOISSUE){
+              setNoIssueConfidence(Math.round((parseFloat(lastJsonMessage?.M?.NOISSUE?.N) ?? 0) *100))
+              //setNoIssueConfidence(predictionData["NOISSUE"]*100).toFixed(2));
             }
-            setCallInstructions(darrenData["Instructions"]);
+            setCallInstructions(predictionData["Instructions"]);
         }
-    }, [darrenData]);
+    }, [predictionData]);
     
-    const connectionStatus = {
-    [ReadyState.CONNECTING]: 'Connecting',
-    [ReadyState.OPEN]: 'Open',
-    [ReadyState.CLOSING]: 'Closing',
-    [ReadyState.CLOSED]: 'Closed',
-    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-  }[readyState];
+    
   
   
   useEffect(() => {
@@ -147,7 +131,7 @@ export default function Call(){
        
         
       <div className='Content'>
-        {darrenData && darrenData.M.POLICE ? 
+        {predictionData && predictionData.M.POLICE ? 
        <div className='Police-Container' style={{transform: `scale(${Math.min((policeConfidence/100)+1,2)})`}}>
             <span>Police Response</span>
             <span>Required</span>
@@ -156,7 +140,7 @@ export default function Call(){
            
         </div> : null}
 
-        {darrenData && darrenData.M.CORESPONDER ? 
+        {predictionData && predictionData.M.CORESPONDER ? 
         <div className='CoResponder-Container' style={{transform: `scale(${Math.min((coResponserConfidence/100)+1,2)})`}}>
             <span>Co-Responder</span>
             <img src= {coResponser} onClick={() => navigate(`/PoliceInfo/${"coResponser"}`)} />
@@ -164,7 +148,7 @@ export default function Call(){
           
         </div> : null}
 
-        {darrenData && darrenData.M.NOISSUE ? 
+        {predictionData && predictionData.M.NOISSUE ? 
         <div className='NoIssue-Container' style={{transform: `scale(${Math.min((noIssueConfidence/100)+1,2)})`}}>
           <span>No Safety Issue</span>
           <img src={noIssue} onClick={() => navigate(`/PoliceInfo/${"noIssue"}`)}/>
@@ -172,7 +156,7 @@ export default function Call(){
         
         </div>  : null }
 
-       {darrenData && darrenData.M.ALTERNATE ? 
+       {predictionData && predictionData.M.ALTERNATE ? 
        <div className='AltResponse-Container' style={{transform: `scale(${Math.min((altResponseConfidence/100)+1,2)})`}}>
           <span>Alternate</span>
           <span>Response</span>
