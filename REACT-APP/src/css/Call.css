@@ -6,7 +6,14 @@
 }
 
 .Call .Title-Container{
+    display: flex;
+    flex-direction: column;
     align-self: center;
+}
+
+.Call .Title-Container .Pending{
+    align-self: center;
+    display: block;
 }
 
 .Call img{
@@ -36,7 +43,12 @@
     font-weight: bold;
     font-size: 1.4em;
     color:#E84F70;
-    margin: auto
+    margin: auto;
+    transition: transform 0.5s ease-in-out;
+    
+}
+.Call .Police-Container img{
+    opacity: 0.7;
 }
 
 .Call .Content ol{
@@ -54,6 +66,10 @@
     font-size: 1.4em;
     color: #F2C46D;
     margin: auto;
+    transition: transform 0.5s ease-in-out;
+}
+.Call .CoResponder-Container img{
+    opacity: 0.7;
 }
 
 .Call .NoIssue-Container{
@@ -65,6 +81,11 @@
     font-size: 1.4em;
     color: #41D9A1;
     margin: auto;
+    transition: transform 0.5s ease-in-out;
+}
+
+.Call .NoIssue-Container img{
+    opacity: 0.7;
 }
 
 .Call .AltResponse-Container{
@@ -76,4 +97,9 @@
     font-size: 1.4em;
     color: #268EA6;
     margin: auto;
+    transition: transform 0.5s ease-in-out;
+}
+
+.Call .AltResponse-Container img{
+    opacity: 0.7;
 }
