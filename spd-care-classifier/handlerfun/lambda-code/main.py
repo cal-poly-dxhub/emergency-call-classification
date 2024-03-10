@@ -15,12 +15,40 @@ def classify_incoming_data(text):
         Text = text,
         EndpointArn=CLASSIFIER_ENDPOINT
     )
-            
+    
+    print("RESPONSE: ", response)
     return(response)
+    
+    
+def recieve_previous(callID):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(TABLE_NAME)
+    
+    try:
+        response = table.get_item(
+            Key={
+            'callId': callID
+            },
+            ProjectionExpression='#pred',
+            ExpressionAttributeNames={"#pred" : "current-prediction"
+           }
+        )
+        # print("RECIEVED PREVIOUS!!")
+        # print(response)
+        if 'Item' not in response:
+            return None
+        else:
+            # print(response['Item'])
+            return response['Item']['current-prediction']
+    except Exception as e:
+        print(f"PREVIOUS_PREDICTION ERROR!: {e}")
+        return None
+    
+    
 
 def upload_to_dynamo(classifier_output):
     """
-    Uploads data as an S3 object to a specified bucket.
+    Uploads prediction data to dynamo table
     
     """
     
@@ -36,14 +64,27 @@ def upload_to_dynamo(classifier_output):
         response = table.put_item(Item=classifier_output)
         print(f"Results uploaded to: {TABLE_NAME}")
     except ClientError as e:
-        print(f"There was an error {e}.")    
+        print(f"There was an error {e}.")
     except NoCredentialsError:
         print("Credentials not available.")
     except Exception as e:
         print(f"error: {e}")
 
+def remove_prediction(callID):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(TABLE_NAME)
+    print(callID)
     
-#TODO: previous and current prediction logic
+    try:
+        response = table.delete_item(
+        Key={'callId': callID}
+        )
+        
+        print("remove success") 
+    except Exception as e:
+        print(f"REMOVE ERROR: {e}")
+        return None
+
 def process_item(item):
     text_to_classify = item["transcript"]["S"]
     operating_procedures = "" #placeholder
@@ -51,31 +92,39 @@ def process_item(item):
     modelResults = classify_incoming_data(text_to_classify)
     outputFile = {}
     finalFile = {}
-    print("ttc: ", text_to_classify, "\nID: ", callID, "\nmodelResults: ", modelResults)
+    # print("ttc: ", text_to_classify, "\nID: ", callID, "\nmodelResults: ", modelResults)
     
     finalFile['callId'] = callID
     for classResult in modelResults["Classes"]:
         className = classResult['Name']
         scoreForClass = classResult['Score']
         outputFile[className] = scoreForClass
+        
     if operating_procedures != "":
         outputFile['Instructions'] = operating_procedures
+        
     finalFile["current-prediction"] = outputFile
-    print("outputFile: ", outputFile)
-    print("Final File: ", finalFile)
+    finalFile["previous-prediction"] = recieve_previous(finalFile['callId'])
+    # print("outputFile: ", outputFile)
+    # print("Final File: ", finalFile)
     upload_to_dynamo(finalFile)
     
 # This funciton allows the caller to retrieve the results of a comprehend custom classifier  as well as sending 
-#TODO: if item gets removed from calls, remove from prediciton
+#TODO: https://repost.aws/knowledge-center/lambda-function-idempotent
 def lambda_handler(event, context):
     records = event["Records"]
     print(records)
-    for i in range(len(records)):
-        if(records[i]["eventName"] != "REMOVE"):
-            item = records[i]["dynamodb"]["NewImage"]
-            print("NEW ITEM!!\n")
-            print(item)
-            process_item(item)
-        else:
-            print("REMOVE", records[i]["dynamodb"]["Keys"]["id"]["S"])
-            return
+    #this is all commented out so the error queue doesnt fill up when we aren't working
+    #create a comprehend endpoint and uncomment code to get functionality
+    try:
+        for i in range(len(records)):                    
+            if(records[i]["eventName"] == "REMOVE"):
+                remove_prediction(records[i]["dynamodb"]["Keys"]["id"]["S"])
+                continue
+            if(records[i]["dynamodb"]["NewImage"]["active"]['BOOL'] == False):
+                continue
+            if(records[i]["eventName"] != "REMOVE"):
+                item = records[i]["dynamodb"]["NewImage"]
+                process_item(item)
+    except Exception as e:
+        print("ERROR:",e)
