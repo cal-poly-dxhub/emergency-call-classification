@@ -25,6 +25,7 @@ Resources:
       Runtime: python3.9
       CodeUri: lambda-code
       Handler: main.lambda_handler
+      Timeout: 10
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref OutputDynamoDBTable
@@ -40,4 +41,6 @@ Resources:
           Properties:
             Stream: arn:aws:dynamodb:us-west-2:882364546937:table/current_calls/stream/2024-03-05T19:15:16.316
             StartingPosition: TRIM_HORIZON
+            MaximumRetryAttempts: 2
+            MaximumRecordAgeInSeconds: 3600
             BatchSize: 5
