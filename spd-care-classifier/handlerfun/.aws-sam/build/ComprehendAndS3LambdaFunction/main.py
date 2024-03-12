@@ -8,6 +8,9 @@ from decimal import Decimal
 CLASSIFIER_ENDPOINT =   "arn:aws:comprehend:us-west-2:882364546937:document-classifier-endpoint/spdcareendpoint"
 TABLE_NAME = "PredictionsTable"
 
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table(TABLE_NAME)
+
 def classify_incoming_data(text):
     client = boto3.client('comprehend')
     
@@ -21,9 +24,6 @@ def classify_incoming_data(text):
     
     
 def recieve_previous(callID):
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(TABLE_NAME)
-    
     try:
         response = table.get_item(
             Key={
@@ -52,9 +52,6 @@ def upload_to_dynamo(classifier_output):
     
     """
     
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(TABLE_NAME)
-    
     # Convert all float values to Decimal so boto3 can use values
     classifier_output['current-prediction'] = {
         key: Decimal(str(value)) for key, value in classifier_output['current-prediction'].items()
@@ -71,8 +68,6 @@ def upload_to_dynamo(classifier_output):
         print(f"error: {e}")
 
 def remove_prediction(callID):
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(TABLE_NAME)
     print(callID)
     
     try:
@@ -116,15 +111,15 @@ def lambda_handler(event, context):
     print(records)
     #this is all commented out so the error queue doesnt fill up when we aren't working
     #create a comprehend endpoint and uncomment code to get functionality
-    try:
-        for i in range(len(records)):                    
-            if(records[i]["eventName"] == "REMOVE"):
-                remove_prediction(records[i]["dynamodb"]["Keys"]["id"]["S"])
-                continue
-            if(records[i]["dynamodb"]["NewImage"]["active"]['BOOL'] == False):
-                continue
-            if(records[i]["eventName"] != "REMOVE"):
-                item = records[i]["dynamodb"]["NewImage"]
-                process_item(item)
-    except Exception as e:
-        print("ERROR:",e)
+    # try:
+    #     for i in range(len(records)):                    
+    #         if(records[i]["eventName"] == "REMOVE"):
+    #             remove_prediction(records[i]["dynamodb"]["Keys"]["id"]["S"])
+    #             continue
+    #         if(records[i]["dynamodb"]["NewImage"]["active"]['BOOL'] == False):
+    #             continue
+    #         if(records[i]["eventName"] != "REMOVE"):
+    #             item = records[i]["dynamodb"]["NewImage"]
+    #             process_item(item)
+    # except Exception as e:
+    #     print("ERROR:",e)
