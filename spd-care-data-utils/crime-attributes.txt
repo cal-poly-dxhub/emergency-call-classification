@@ -1,0 +1,3 @@
+# 10 patters of crime, including common modes of accessing a victim (luring, breaking in while they’re asleep, waiting until they’re on vacation and burglarizing while they’re out), common tools used to access secure locations (lock picks, use of prybars or heavy tools to force a door, explosive entry or tunneling, etc.) and force (physical force, threats of violence, knives, guns, etc.)?
+
+ # modes of accessing a victim, common tools used to access secure locations, type of force used
