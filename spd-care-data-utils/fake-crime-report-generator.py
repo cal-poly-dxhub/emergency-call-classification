@@ -3,10 +3,6 @@ import boto3
 import os
 import numpy as np
 import traceback
-import dbconnection
-import requests
-import json
-import psycopg2
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.chat_models import BedrockChat
@@ -62,7 +58,7 @@ def generate_crime_response(data):
     )
 # 10 patters of crime, including common modes of accessing a victim (luring, breaking in while they’re asleep, waiting until they’re on vacation and burglarizing while they’re out), common tools used to access secure locations (lock picks, use of prybars or heavy tools to force a door, explosive entry or tunneling, etc.) and force (physical force, threats of violence, knives, guns, etc.)?
     human_prompt = "I want to generate a fake police report with as much detail as possible based on the following parameters \
-                 <modes of accessing a victim>, <common tools used to access secure locations>, <type of force used>\
+                 <crime type>, <modes of accessing a victim>, <common tools used to access secure locations>, <type of force used>, <tools used in the actual crime>\
                  given the following data {data} can you please generate a detailed police report, feel free to embellish the details."
     messages = [
         ("system", "You are a criminogist expert and want to experiment with detecting patterns in crime reports."),
@@ -95,14 +91,16 @@ def main():
 
     with open("crime-attributes.txt", 'r') as file:
         # Read each line, strip whitespace, and convert directly to an integer
+        i = 0
         for line in file:
-            query = line.strip()
-            print(f"Q(PGVECTOR): {query}")
-            vec_embed = generate_vector_embedding(query)
-            run_similarity_search_pgvector(15, query, vec_embed, conn)
-            print(f"Q(OpenSearch): {query}")
-            run_similarity_search_opensearch(5, query)
-        
+            # Skip the first line (header)
+            if i==0:
+                i=i+1
+                continue
+            # Generate the crime report for each line in the file
+            data = line.strip()
+            print(generate_crime_response(data))
+            
 
     
 if __name__ == "__main__":
