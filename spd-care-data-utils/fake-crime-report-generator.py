@@ -58,10 +58,10 @@ def generate_crime_response(data):
     )
 # 10 patters of crime, including common modes of accessing a victim (luring, breaking in while they’re asleep, waiting until they’re on vacation and burglarizing while they’re out), common tools used to access secure locations (lock picks, use of prybars or heavy tools to force a door, explosive entry or tunneling, etc.) and force (physical force, threats of violence, knives, guns, etc.)?
     human_prompt = "I want to generate a fake police report with as much detail as possible based on the following parameters \
-                 <crime type>, <modes of accessing a victim>, <common tools used to access secure locations>, <type of force used>, <tools used in the actual crime>\
-                 given the following data {data} can you please generate a detailed police report, feel free to embellish the details."
+                 <crime type>, <modes of accessing a victim>, <common tools used to access secure locations>, <type of force used>, <weapons used in the crime>\
+                 given the following data {data} can you please generate a detailed police report, feel free to embellish the details and be creative."
     messages = [
-        ("system", "You are a criminogist expert and want to experiment with detecting patterns in crime reports."),
+        ("system", "You are a criminologist expert and want to experiment with detecting patterns in crime reports."),
         ("human", human_prompt),
     ]
     try:
@@ -83,24 +83,51 @@ def generate_crime_response(data):
     except Exception as e:
         exc_type, exc_value, exc_traceback = traceback.sys.exc_info()
         line_number = exc_traceback.tb_lineno
+        print(f"Error generating report: {exc_type}{exc_value}{exc_traceback} on {line_number}")
+        exit()
 
-        return f"ERROR generating report: {exc_type}{exc_value}{exc_traceback} on {line_number}"
+def output_text_to_file(text, filename):
+    """
+    Writes the given text to a file with the given filename.
 
+    :param text: The text to be written to the file.
+    :param filename: The name of the file to write the text to.
+    """
+    try:
+        with open(filename, 'w') as file:
+            file.write(text)
+    except Exception as e:
+        print(f"Error writing to file: {e}")
+        raise e
+    else:
+        print(f"Text written to file: {filename}")
+        return text
+    # finally:
+    #     # Clean up the file if it was created
+    #     if os.path.exists(filename):
+    #         os.remove(filename)
+    #     else:
+    #         print(f"File {filename} does not exist")
+    #     return text
+    return text
+    # Clean up the file if it was created
+    if os.path.exists(filename):
+        os.remove(filename)
+    else:
+        print(f"File {filename} does not exist")
+    return text
+    # Clean up the file if it was created
 
 def main():
 
     with open("crime-attributes.txt", 'r') as file:
         # Read each line, strip whitespace, and convert directly to an integer
-        i = 0
+        i = 208
         for line in file:
-            # Skip the first line (header)
-            if i==0:
-                i=i+1
-                continue
             # Generate the crime report for each line in the file
             data = line.strip()
-            print(generate_crime_response(data))
-            
+            output_text_to_file(generate_crime_response(data), "crime-report-"+str(i)+".txt")
+            i=i+1
 
     
 if __name__ == "__main__":
