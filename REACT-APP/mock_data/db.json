@@ -1,8 +1,0 @@
-{
-  "confidence": {
-    "Police-Response": 0.43,
-    "Alt-Response" : 0.31,
-    "Co-Responder" : 0.2,
-    "No-issue" : 0.06
-  }
-}

@@ -63,5 +63,6 @@ def main(text_to_classify, operating_procedures):
 
 
 if __name__ == "__main__":
-    main("Loud bang near my home", "Be sure to speak in a reassuring voice and let them know help is on the way.\nTell the caller you will remain on the line until help has arrived")
+    main("School fundraising bakesale on 5th.", ""
+)
 

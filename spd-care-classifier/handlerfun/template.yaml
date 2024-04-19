@@ -25,7 +25,7 @@ Resources:
       Runtime: python3.9
       CodeUri: lambda-code
       Handler: main.lambda_handler
-      Timeout: 10
+      Timeout: 900
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref OutputDynamoDBTable
