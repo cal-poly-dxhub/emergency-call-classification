@@ -1,0 +1,31 @@
+.InstructionsCard{
+  border: 0.4em solid;
+}
+
+.InstructionsCard .Instructions-Container{
+    /* background-color: red; */
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.InstructionsCard .Instructions-Container li{
+    margin-bottom: 3em;
+    font-size: large;
+    margin-left: 3em;
+    margin-right: 3em;
+}
+
+.InstructionsCard .Instructions-Container .Title-Img-Container{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /*white-space: nowrap;*/
+}
+
+
+.InstructionsCard img{
+    max-width: 10%;
+    padding-right: 1.4em;
+}
