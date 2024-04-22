@@ -10,7 +10,6 @@
   .Landing .Calls-Container{
     flex-grow: 1;
     height: 100%;
-    /* align-self: flex-start; */
     display: flex;
     flex-direction: column;
     justify-content: space-around;
