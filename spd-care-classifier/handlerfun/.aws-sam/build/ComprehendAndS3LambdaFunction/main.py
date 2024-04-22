@@ -39,12 +39,9 @@ def recieve_previous(callID):
                                       "#prev_pred" : "previous-prediction"
            }
         )
-        # print("RECIEVED PREVIOUS!!")
-        # print(response)
         if 'Item' not in response:
             return []
         else:
-            # print(response['Item'])
             previous_preds = response['Item']['previous-prediction']
             prev = response['Item']['current-prediction']
             previous_preds.append(prev)
@@ -72,6 +69,7 @@ def upload_to_dynamo(classifier_output):
     except Exception as e:
         print(f"error: {e}")
 
+#If not active anymore
 def remove_prediction(callID):
     print(callID)
     
@@ -85,11 +83,13 @@ def remove_prediction(callID):
         print(f"REMOVE ERROR: {e}")
         return None
         
+
 def get_score(className, modelResults):
     for cls in modelResults["Classes"]:
         if cls["Name"] == className:
             return cls["Score"]
 
+#bulk of work to upload item and get previous prediction data for stabilization.
 def process_item(item):
     text_to_classify = item["transcript"]["S"]
     operating_procedures = "" #placeholder
@@ -99,7 +99,6 @@ def process_item(item):
     classes = ["POLICE", "ALTERNATE", "CORESPONDER", "NOISSUE"]
     finalFile = {}
     finalFile["callId"] = callID
-    # print("ttc: ", text_to_classify, "\nID: ", callID, "\nmodelResults: ", modelResults)
     
     for i, cls in enumerate(classes):
         if class_exists(cls, modelResults):
@@ -117,8 +116,6 @@ def process_item(item):
         
     finalFile["current-prediction"] = prediction_list
     finalFile["previous-prediction"] = recieve_previous(finalFile['callId'])
-    # print("outputFile: ", outputFile)
-    # print("Final File: ", finalFile)
     upload_to_dynamo(finalFile)
     
 # This funciton allows the caller to retrieve the results of a comprehend custom classifier  as well as sending 

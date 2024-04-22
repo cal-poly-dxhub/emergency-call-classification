@@ -35,13 +35,7 @@ export default function Call(){
       reconnectInterval: 3000 //ms
     });
     
-    const instructions = `Lorem ipsum dolor sit amet consectetur, adipisicing elit. 
-    Blanditiis facere quas libero commodi obcaecati, porro assumenda! Qui deleniti 
-    soluta\nLorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis 
-    facere quas libero commodi obcaecati, porro assumenda! 
-    Qui deleniti soluta\nLorem ipsum dolor sit amet consectetur, adipisicing 
-    elit. Blanditiis facere quas libero 
-    commodi obcaecati, porro assumenda! Qui deleniti soluta`;
+    const instructions = "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis facere quas libero commodi obcaecati, porro assumenda! Qui deleniti soluta\nLorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis facere quas libero commodi obcaecati, porro assumenda! Qui deleniti soluta\nLorem ipsum dolor sit amet consectetur, adipisicing  elit. Blanditiis facere quas libero commodi obcaecati, porro assumenda! Qui deleniti soluta";
 
 
     const connectionStatus = {
@@ -62,7 +56,8 @@ export default function Call(){
         
     useEffect(() => {
       if (predictionData) {
-          
+        
+        
         setPoliceConfidence(Math.round((parseFloat(predictionData["predictions"][0]) ?? 0) * 100));
         setAltResponseConfidence(Math.round((parseFloat(predictionData["predictions"][1]) ?? 0) * 100));
         setCoResponserConfidence(Math.round((parseFloat(predictionData["predictions"][2]) ?? 0) * 100));
@@ -72,9 +67,9 @@ export default function Call(){
       }
     }, [predictionData]);
     
-   useEffect(()=>{
-    console.log("stable: ", stable);
-   }, [stable]);
+  // useEffect(()=>{
+  //   console.log("stable: ", stable);
+  // }, [stable]);
   
   const getColor = () =>{ //for instruction box
     const colors = ["red", "blue", "yellow", "green"];
@@ -87,6 +82,7 @@ export default function Call(){
   };
   
   
+  //pseudo animation function for "predicting..." text
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentText((prevText) => (prevText + 1) % loadingTexts.length);
@@ -109,6 +105,7 @@ export default function Call(){
           
         <span>The WebSocket is currently {connectionStatus}</span> 
         
+        
         <div className='Content'>
         
           {stable && 
@@ -116,11 +113,11 @@ export default function Call(){
           }
           
           {!stable && predictionData && (predictionData["predictions"][0] > 0) ? 
-         <div className='Police-Container' style={{transform: `scale(${Math.min((policeConfidence/100)+1,2)})`}}>
+         <div className='Police-Container' style={{transform: `scale(${Math.min((policeConfidence/100)+1,2)})`}}> {/* transform for animated resizing. min function to guard overflow*/}
               <span>Police Response</span>
               <span>Required</span>
               <img src={policeResponse}/>
-              <span>{Math.min(policeConfidence,100)}%</span>
+              <span>{Math.min(policeConfidence,100)}%</span> {/* min function in case prediction goes over 100*/}
              
           </div> : null}
   
@@ -136,7 +133,7 @@ export default function Call(){
           <div className='NoIssue-Container' style={{transform: `scale(${Math.min((noIssueConfidence/100)+1,2)})`}}>
             <span>No Safety Issue</span>
             <img src={noIssue}/>
-            <span>{Math.min(noIssueConfidence,100)}%</span>
+            <span>{Math.min(noIssueConfidence,100)}%</span> 
           
           </div>  : null }
   

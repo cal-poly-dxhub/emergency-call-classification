@@ -69,6 +69,7 @@ def upload_to_dynamo(classifier_output):
     except Exception as e:
         print(f"error: {e}")
 
+#If not active anymore
 def remove_prediction(callID):
     print(callID)
     
@@ -82,11 +83,13 @@ def remove_prediction(callID):
         print(f"REMOVE ERROR: {e}")
         return None
         
+
 def get_score(className, modelResults):
     for cls in modelResults["Classes"]:
         if cls["Name"] == className:
             return cls["Score"]
 
+#bulk of work to upload item and get previous prediction data for stabilization.
 def process_item(item):
     text_to_classify = item["transcript"]["S"]
     operating_procedures = "" #placeholder
