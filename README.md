@@ -54,16 +54,24 @@ aws s3 sync <build directory> <s3 destination link>
 
 ## Backend Services
 
+### Background
+- The backend of the SPD Care Project is constructed using AWS serverless technologies which are orchestrated to handle data-intensive operations and real-time interactions.
+- Key functionalities include audio processing, data transcription via AWS Transcribe, and real-time prediction delivery through WebSocket connections managed by AWS Lambda functions.
+- The system is designed for high availability and scalability, ensuring it can handle an increasing load of data and user interactions without performance bottlenecks.
+
 ### Overview
 The backend is responsible for audio processing, transcription via AWS Transcribe, storing call data, and sending predictions to the frontend through WebSocket connections managed by AWS Lambda.
 
 ### Audio Diarization - `audio_diarization.py`
-This script handles real-time transcription excluding the call operator's speech and updates the `current_calls` DynamoDB table.
+This Python script records audio from a local microphone, sends the audio stream to AWS Transcribe, and writes the transcription to the `current_calls` DynamoDB table in real time, excluding the 911 call operator's speech.
 
 #### Prerequisites for Backend
 - AWS CLI
 - Python 3.x
 - Libraries: Boto3, Sounddevice, Amazon Transcribe Streaming Service
+
+#### Environment Setup
+Before running the script, ensure that the AWS credentials are set up with the required permissions to access Transcribe services and DynamoDB.
 
 #### Running the Script
 Start processing audio streams with:
@@ -80,16 +88,20 @@ Manage WebSocket connections, adding or removing entries in `ConnectionIdMapping
 
 ### DynamoDB Tables
 #### ConnectionIdMappingTable
-Stores WebSocket connection IDs.
+This table stores connection IDs for WebSocket clients, which are used to send prediction data to the frontend.
 
 #### current_calls
-Contains transcriptions of ongoing calls.
+This table holds the real-time transcription data, with each row representing a single call. The `audio_diarization.py` script updates this table.
 
 #### PredictionsTable
-Captures predictive analysis data.
+This table captures prediction data from the machine learning model. The `SendSessionData` Lambda function reads from this table to process and send predictions.
 
 ### WebSocket API via API Gateway (`SPD Demo`)
-Manages full-duplex communication with the frontend.
+This interface provides full-duplex communication channels over a single TCP connection. It enables real-time data exchange between the client and server.
+
+#### Routes
+- `connect`: Invoked when a client establishes a new WebSocket connection.
+- `disconnect`: Invoked when a client's WebSocket connection is closed.
 
 ### Known Bugs/Concerns
 - Hardcoded 'Seattle' as call location.
@@ -98,6 +110,7 @@ Manages full-duplex communication with the frontend.
 ### Future Backend Work
 - Enable multiple simultaneous call sessions.
 - Dynamically determine the operation location.
+- Accurate stability modeling.
 
 ## AWS SAM for Backend Deployment
 Use AWS Serverless Application Model (SAM) for deployment with the `template.yaml` file:
@@ -109,3 +122,9 @@ sam deploy --guided
 ## Additional Resource Links
 - [AWS SAM configuration](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/prerequisites.html)
 - [Vite guide](https://vitejs.dev/guide/)
+
+## Support
+For any queries or issues, please contact:
+- Darren Kraker, Sr Solutions Architect - dkraker@amazon.com
+- Pallavi Das, Software Developer Intern - padas@calpoly.edu
+- Ryan Gertz, Software Developer Intern - rgertz@calpoly.edu
